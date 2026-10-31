@@ -14,7 +14,13 @@
     ['everyday', 'ชุดประจำวัน'], ['formal', 'ชุดทางการ'], ['athletic', 'ชุดกีฬา'], ['sleep', 'ชุดนอน'],
     ['party', 'ชุดปาร์ตี้'], ['swimwear', 'ชุดว่ายน้ำ'], ['hotWeather', 'ชุดอากาศร้อน'], ['coldWeather', 'ชุดอากาศหนาว'],
   ];
-  const OCCULT_OPTIONS = [['human', 'มนุษย์'], ['fairy', 'นางฟ้า'], ['vampire', 'แวมไพร์'], ['witch', 'ผู้ใช้เวทมนตร์']];
+  // All seven occult tags the game has, in the game's order.
+  const OCCULT_OPTIONS = [
+    ['human', 'มนุษย์'], ['alien', 'เอเลี่ยน'], ['vampire', 'แวมไพร์'], ['mermaid', 'เงือก'],
+    ['witch', 'ผู้ใช้เวทมนตร์'], ['werewolf', 'มนุษย์หมาป่า'], ['fairy', 'นางฟ้า'],
+  ];
+  // EA's own looks allow these; forms with special bodies (alien, mermaid, werewolf) start off.
+  const DEFAULT_OCCULTS = ['human', 'vampire', 'witch', 'fairy'];
 
   const state = {
     screen: 'tray', sims: [], error: '', shown: PAGE, multi: false, ccOnly: false, selected: new Set(), query: '',
@@ -217,7 +223,7 @@
       genders, hair: false,
       ages: defaultAges(first.age),
       outfitCategories: ['everyday'],
-      occults: OCCULT_OPTIONS.map(([k]) => k),
+      occults: [...DEFAULT_OCCULTS],
       pose: genders[0] === 'female' ? 'FeaturedLook_F_CoverGirl' : 'FeaturedLook_M_Confident',
       swatches, active: 0,
     };
@@ -263,6 +269,7 @@
         <div class="stage" style="background:${stageBg(look.bg)}">
           ${sw && interactive ? `<img class="model" data-sim="${esc(sw.sim.key)}" alt="">` : '<div class="placeholder"></div>'}
           <button class="bg-btn" id="bg-btn" title="สีพื้นหลัง">${icons.palette}</button>
+          ${look.swatches.length > 1 ? `<span class="outfit-tag"><i style="background:${sw.color}"></i>ชุดที่ ${look.active + 1}/${look.swatches.length}</span>` : ''}
           <button class="inset" id="pose-inset" title="เลือกท่าโพส: ${esc(poseLabel(look.pose))}" style="background:${stageBg(look.bg)}">
             <img src="assets/poses/${look.pose}.png" alt="">
           </button>
@@ -295,12 +302,12 @@
           <div class="swatches">
             ${look.swatches.map((s, i) => `<button class="swatch ${i === look.active ? 'active' : ''}" data-i="${i}" style="background:${s.color}" title="สีที่ ${i + 1} — ${esc(s.sim.firstName)}"></button>`).join('')}
           </div>
-          <div class="swatch-hint">คลิกเพื่อดูตัวอย่างชุด คลิกอีกครั้งเพื่อเปลี่ยนสี</div>
+          <div class="swatch-hint">แต่ละวงคือ 1 ชุด คลิกเพื่อเลือกชุดและเปลี่ยนสี<br>รูปจะเปลี่ยนเฉพาะเมื่อเป็นชุดของซิมคนละตัว (เกมเก็บรูปไว้ซิมละ 1 รูป)</div>
         </div>
         <div class="opt-group"><h3>ประเภทชุด${info('ลุคนี้จะใช้ได้กับประเภทชุดที่เลือก เช่น เลือกชุดประจำวันกับชุดอากาศร้อน ลุคจะขึ้นในทั้งสองหมวด')}</h3><div class="chips">
           ${CATEGORY_OPTIONS.map(([k, l]) => chip('outfitCategories', k, l, look.outfitCategories.includes(k))).join('')}
         </div></div>
-        <div class="opt-group"><h3>เผ่าพันธุ์ที่ใส่ได้${info('ลุคนี้จะใช้ได้กับเผ่าพันธุ์ที่เลือก เช่น มนุษย์ นางฟ้า แวมไพร์ ผู้ใช้เวทมนตร์')}</h3><div class="chips">
+        <div class="opt-group"><h3>เผ่าพันธุ์ที่ใส่ได้${info('ลุคนี้จะใช้ได้กับเผ่าพันธุ์ที่เลือก มีครบ 7 แบบตามเกม: มนุษย์ เอเลี่ยน แวมไพร์ เงือก ผู้ใช้เวทมนตร์ มนุษย์หมาป่า นางฟ้า')}</h3><div class="chips">
           ${OCCULT_OPTIONS.map(([k, l]) => chip('occults', k, l, look.occults.includes(k))).join('')}
         </div></div>
       </div>`;
@@ -314,8 +321,12 @@
 
     $('#look-name').oninput = e => { look.name = e.target.value; };
     $('#creator').oninput = e => { look.creator = e.target.value; store.set('creator', look.creator); };
+    // Live preview while dragging on the wheel; Cancel restores the saved color.
+    const paintBg = hex => view.querySelectorAll('.stage, .inset').forEach(el => { el.style.background = stageBg(hex); });
     $('#bg-btn').onclick = e => SLS.colorPicker.show(e.currentTarget, {
       title: 'สีพื้นหลัง', color: look.bg,
+      onChange: paintBg,
+      onCancel: () => paintBg(look.bg),
       onApply: c => { look.bg = c; store.set('bg', c); renderEditor(); },
     });
     $('#pose-inset').onclick = e => openPosePicker(e.currentTarget);
@@ -331,11 +342,15 @@
       }
       renderEditor();
     });
-    view.querySelectorAll('.swatch').forEach(b => b.onclick = () => {
-      const i = +b.dataset.i;
-      if (i !== look.active) { look.active = i; return renderEditor(); }
+    // One click selects the outfit and opens its color picker.
+    view.querySelectorAll('.swatch').forEach(el => el.onclick = () => {
+      const i = +el.dataset.i;
+      if (i !== look.active) { look.active = i; renderEditor(); }
+      const b = view.querySelector(`.swatch[data-i="${i}"]`);
       SLS.colorPicker.show(b, {
         title: `สีที่ ${i + 1}`, color: look.swatches[i].color,
+        onChange: c => { b.style.background = c; const dot = view.querySelector('.outfit-tag i'); if (dot) dot.style.background = c; },
+        onCancel: () => { b.style.background = look.swatches[i].color; const dot = view.querySelector('.outfit-tag i'); if (dot) dot.style.background = look.swatches[i].color; },
         onApply: c => { look.swatches[i].color = c; renderEditor(); },
       });
     });

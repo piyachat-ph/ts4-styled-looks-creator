@@ -18,15 +18,19 @@
 
   let open = null;
 
-  function close() {
+  // Closing without Apply (Cancel, Esc, click outside) calls onCancel so live previews can revert.
+  function close(applied) {
     if (!open) return;
+    const { onCancel } = open;
     open.el.remove();
     document.removeEventListener('pointerdown', open.outside, true);
     document.removeEventListener('keydown', open.esc);
     open = null;
+    if (!applied && onCancel) onCancel();
   }
 
-  // show(anchorEl, { title, color: '#RRGGBB', onApply(hex) })
+  // show(anchorEl, { title, color: '#RRGGBB', onApply(hex), onChange(hex)?, onCancel()? })
+  // onChange fires on every change for a live preview.
   function show(anchor, opts) {
     close();
     let [h, s, v] = rgbToHsv(hexToRgb(opts.color) || [139, 77, 255]);
@@ -68,11 +72,12 @@
       ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(0,0,0,.35)'; ctx.stroke();
     }
     const current = () => rgbToHex(hsvToRgb(h, s, v));
-    function sync(fromHex) {
+    function sync(fromHex, initial) {
       slider.value = Math.round(v * 100);
       if (!fromHex) hexIn.value = current();
       preview.style.background = current();
       drawWheel();
+      if (!initial && opts.onChange) opts.onChange(current());
     }
 
     const pick = e => {
@@ -89,8 +94,8 @@
     drop.addEventListener('click', async () => {
       try { const res = await new window.EyeDropper().open(); [h, s, v] = rgbToHsv(hexToRgb(res.sRGBHex)); sync(); } catch { /* cancelled */ }
     });
-    el.querySelector('[data-act=cancel]').onclick = close;
-    el.querySelector('[data-act=apply]').onclick = () => { const c = current(); close(); opts.onApply(c); };
+    el.querySelector('[data-act=cancel]').onclick = () => close();
+    el.querySelector('[data-act=apply]').onclick = () => { const c = current(); close(true); opts.onApply(c); };
 
     // Position next to the anchor, kept inside the viewport.
     const a = anchor.getBoundingClientRect(), w = el.offsetWidth, ht = el.offsetHeight;
@@ -104,8 +109,8 @@
     const esc = e => { if (e.key === 'Escape') close(); };
     setTimeout(() => document.addEventListener('pointerdown', outside, true));
     document.addEventListener('keydown', esc);
-    open = { el, outside, esc };
-    sync();
+    open = { el, outside, esc, onCancel: opts.onCancel };
+    sync(false, true);
   }
 
   SLS.colorPicker = { show, close, hexToRgb, rgbToHex };

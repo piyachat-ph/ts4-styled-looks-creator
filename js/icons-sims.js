@@ -99,5 +99,28 @@
       <path d="M8.4 5.2l-1.6 22" stroke="#f3e2c0" stroke-width="1.4" transform="rotate(8 16 16)"/>
       <circle cx="16.6" cy="15.8" r="5.2" fill="url(#${id('b')})" stroke="#8a6408" stroke-width="1"/>
       <path d="M16.6 12.2l1 2.4 2.6.2-2 1.6.7 2.5-2.3-1.4-2.2 1.4.6-2.5-2-1.6 2.6-.2z" fill="#a8740c"/>`),
+    alien: icon(id => `<defs>${rad(id('a'), '#d9ffd0', '#6fcf5a')}</defs>
+      <path d="M16 3.4c6.6 0 10.6 4.6 10.6 10 0 6.4-6 14.6-10.6 14.6S5.4 19.8 5.4 13.4c0-5.4 4-10 10.6-10z" fill="url(#${id('a')})" stroke="#2f7a24" stroke-width="1.2"/>
+      <path d="M8.6 14.2c2.6-.6 5.2.6 5.8 3.6-2.8.8-5.6-.4-5.8-3.6zM23.4 14.2c-2.6-.6-5.2.6-5.8 3.6 2.8.8 5.6-.4 5.8-3.6z" fill="#1d2a22"/>
+      <path d="M10 15.2l1.6.4M22 15.2l-1.6.4" stroke="#fff" stroke-opacity=".7" stroke-width=".9" stroke-linecap="round"/>
+      <path d="M14.6 23.2c.9.5 1.9.5 2.8 0" stroke="#2f7a24" stroke-width=".9" fill="none" stroke-linecap="round"/>
+      <ellipse cx="12.4" cy="8" rx="3" ry="1.6" fill="#fff" opacity=".5"/>`),
+    mermaid: icon(id => `<defs>${lin(id('a'), '#7ff0e0', '#1d8fb0', 1, 1)}${lin(id('b'), '#b8fff4', '#36b8c8', 1, 0)}</defs>
+      <path d="M13.4 3.6c3.6-.4 6.2 2 6.2 5.6 0 3-1.4 4.8-1.4 7.6 0 3.2 2 5.2 2 7.6l-3.6.6c-.6-2.4-2.8-4.2-3.2-7.4-.4-3.4 1.6-5.6 1-8.8-.2-1.6-.6-3.6-1-5.2z" fill="url(#${id('a')})" stroke="#155f78" stroke-width="1.2" stroke-linejoin="round"/>
+      <path d="M16.6 24.2c-2.6 0-6.4 1.6-8.4 4.4 3.2.4 6.2-.6 8.6-2.4 1.6 2 4.8 3 8 2.4-1.8-2.6-5.6-4.4-8.2-4.4z" fill="url(#${id('b')})" stroke="#155f78" stroke-width="1.1" stroke-linejoin="round"/>
+      <g stroke="#e9fffb" stroke-opacity=".8" stroke-width=".8" fill="none" stroke-linecap="round"><path d="M15.4 11.4c.8.4 1.6.4 2.4 0M15 15c.8.4 1.6.4 2.4 0M15.6 18.6c.8.4 1.6.4 2.4 0"/></g>`),
+    werewolf: icon(id => `<defs>${lin(id('a'), '#b9a189', '#5b4532')}${lin(id('b'), '#efe2cf', '#b9a189')}</defs>
+      <path d="M6.6 3.6l4.4 6.2h10l4.4-6.2.4 9.8c0 2.4-.6 4.4-1.8 6.2L20.6 26c-1.4 2.2-3 3-4.6 3s-3.2-.8-4.6-3L8 19.6c-1.2-1.8-1.8-3.8-1.8-6.2z" fill="url(#${id('a')})" stroke="#3a2a1c" stroke-width="1.2" stroke-linejoin="round"/>
+      <path d="M11.4 19.4c1.4-1.6 3-2.2 4.6-2.2s3.2.6 4.6 2.2l-1.4 5c-1 1.4-2 2-3.2 2s-2.2-.6-3.2-2z" fill="url(#${id('b')})"/>
+      <path d="M13.8 19.6h4.4l-2.2 2.2z" fill="#2a1f16"/>
+      <g fill="#ffd23a" stroke="#7a4d00" stroke-width=".6"><path d="M9.6 13.6l3.6 1.2-3.2 1.2z"/><path d="M22.4 13.6l-3.6 1.2 3.2 1.2z"/></g>
+      <path d="M8.2 6.6l2 3M23.8 6.6l-2 3" stroke="#e6c9a8" stroke-width="1" stroke-linecap="round"/>`),
   });
+
+  // Picture icons (MidniteTech Sims icon set) replace the drawn ones where the set has a match;
+  // gender symbols and age figures keep the drawn versions above.
+  for (const key of ['hair', 'everyday', 'formal', 'athletic', 'sleep', 'party', 'swimwear', 'hotWeather', 'coldWeather',
+    'human', 'alien', 'vampire', 'mermaid', 'witch', 'werewolf', 'fairy']) {
+    SLS.icons[key] = `<img class="pic-icon" src="assets/icons/${key}.png" alt="" draggable="false">`;
+  }
 })(globalThis.SLS = globalThis.SLS || {});

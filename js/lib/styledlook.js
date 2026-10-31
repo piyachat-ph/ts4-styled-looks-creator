@@ -29,7 +29,7 @@
   const TAGS = {
     gender: { male: 1529, female: 1530 },
     outfit: { everyday: 77, formal: 78, athletic: 80, sleep: 81, party: 83, swimwear: 1229, hotWeather: 2053, coldWeather: 2054 },
-    occult: { human: 1310, fairy: 3305, vampire: 1677, witch: 2279 },
+    occult: { human: 1310, alien: 3005, vampire: 1677, mermaid: 2208, witch: 2279, werewolf: 2779, fairy: 3305 },
   };
 
   function parse(bytes) {

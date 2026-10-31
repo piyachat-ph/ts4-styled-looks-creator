@@ -162,6 +162,11 @@ main { min-height: calc(100vh - 64px); display: flex; justify-content: center; p
   position: absolute; top: 10px; right: 10px; width: 30px; height: 30px; border-radius: 8px; border: 0;
   background: rgba(255,255,255,.85); color: #555; display: grid; place-items: center;
 }
+.stage .outfit-tag {
+  position: absolute; top: 12px; left: 10px; display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,.88); border-radius: 999px; padding: 3px 10px 3px 4px; font-size: 11px; font-weight: 500;
+}
+.stage .outfit-tag i { width: 14px; height: 14px; border-radius: 50%; box-shadow: 0 0 0 1.5px #fff, 0 0 0 2.5px rgba(0,0,0,.12); }
 .stage .bg-btn svg { width: 17px; height: 17px; }
 .stage .inset {
   position: absolute; right: 10px; bottom: 10px; width: 54px; height: 76px; border-radius: 8px; overflow: hidden; padding: 4px 2px 2px;
@@ -193,16 +198,17 @@ main { min-height: calc(100vh - 64px); display: flex; justify-content: center; p
   background: #fff; color: var(--text); border: 1px solid var(--line); box-shadow: 0 6px 18px rgba(0,0,0,.1);
   border-radius: 8px; padding: 8px 10px; font-size: 11.5px; font-weight: 400; line-height: 1.5; width: 240px; white-space: normal;
 }
-.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chips { display: flex; flex-wrap: wrap; gap: 4px; }
 .chip {
   position: relative; width: 40px; height: 40px; border-radius: 10px; border: 0; background: transparent;
   display: grid; place-items: center; transition: background .12s, transform .12s;
 }
-.chip svg { width: 30px; height: 30px; overflow: visible; filter: drop-shadow(0 1px 1px rgba(0,0,0,.18)); transition: filter .15s; }
-.chip:not(.on) svg { filter: grayscale(1) contrast(.55) brightness(1.75) drop-shadow(0 1px 1px rgba(0,0,0,.22)); }
+.chip svg, .chip .pic-icon { width: 30px; height: 30px; overflow: visible; filter: drop-shadow(0 1px 1px rgba(0,0,0,.18)); transition: filter .15s; }
+.chip .pic-icon { width: 32px; height: 32px; pointer-events: none; }
+.chip:not(.on) svg, .chip:not(.on) .pic-icon { filter: grayscale(1) contrast(.55) brightness(1.75) drop-shadow(0 1px 1px rgba(0,0,0,.22)); }
 .chip:hover { background: rgba(255,255,255,.6); transform: translateY(-1px); }
 .chip:disabled { cursor: not-allowed; transform: none; background: transparent; }
-.chip:disabled svg { opacity: .35; }
+.chip:disabled svg, .chip:disabled .pic-icon { opacity: .35; }
 .chips .sep { width: 1px; align-self: stretch; margin: 6px 6px; background: #d5d8e2; }
 .opt-row .vsep { width: 1px; background: #d5d8e2; margin: 4px -14px 20px; }
 .chip[data-tip]:hover::after, .chip[data-tip]:focus-visible::after {
