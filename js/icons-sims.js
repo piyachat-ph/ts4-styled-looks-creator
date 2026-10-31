@@ -119,7 +119,7 @@
 
   // Picture icons (MidniteTech Sims icon set) replace the drawn ones where the set has a match;
   // gender symbols and age figures keep the drawn versions above.
-  for (const key of ['hair', 'everyday', 'formal', 'athletic', 'sleep', 'party', 'swimwear', 'hotWeather', 'coldWeather',
+  for (const key of ['hair', 'makeup', 'everyday', 'formal', 'athletic', 'sleep', 'party', 'swimwear', 'hotWeather', 'coldWeather',
     'human', 'alien', 'vampire', 'mermaid', 'witch', 'werewolf', 'fairy']) {
     SLS.icons[key] = `<img class="pic-icon" src="assets/icons/${key}.png" alt="" draggable="false">`;
   }

@@ -220,7 +220,7 @@
       name: 'ชุด 001',
       creator: store.get('creator', first.creator || ''),
       bg: store.get('bg', '#52C4D2'),
-      genders, hair: false,
+      genders, hair: false, makeup: false,
       ages: defaultAges(first.age),
       outfitCategories: ['everyday'],
       occults: [...DEFAULT_OCCULTS],
@@ -292,7 +292,8 @@
           </div></div>
           <div class="vsep"></div>
           <div class="opt-group"><h3>รายละเอียด</h3><div class="chips">
-            ${chip('hair', 'hair', 'ถ้าเปิดไว้ ทรงผมของซิมต้นแบบจะถูกใส่ไปพร้อมกับชุดและเมคอัพด้วย', look.hair, 'ใส่ทรงผมด้วย')}
+            ${chip('hair', 'hair', 'ถ้าเปิดไว้ ทรงผมของซิมต้นแบบจะถูกใส่ไปพร้อมกับชุดด้วย', look.hair, 'ใส่ทรงผมด้วย')}
+            ${chip('makeup', 'makeup', 'ถ้าเปิดไว้ เมคอัพ (ลิปสติก อายแชโดว์ อายไลเนอร์ บลัช มาสคาร่า) และเล็บของซิมต้นแบบจะถูกใส่ไปด้วย ถ้าปิดไว้ จะใส่ให้เฉพาะเสื้อผ้า', look.makeup, 'ใส่เมคอัพด้วย')}
           </div></div>
         </div>
         <div class="opt-group"><h3>ช่วงวัยที่ใส่ได้${info('ซิมจะใส่ชุดนี้ได้ตามช่วงวัยที่เลือก ช่วงวัยที่จางคือใช้ไม่ได้ เพราะรูปร่างไม่ตรงกับซิมต้นแบบ')}</h3><div class="chips">
@@ -334,6 +335,7 @@
     view.querySelectorAll('.chip').forEach(c => c.onclick = () => {
       const { group, key } = c.dataset;
       if (group === 'hair') look.hair = !look.hair;
+      else if (group === 'makeup') look.makeup = !look.makeup;
       else {
         const list = look[group];
         const i = list.indexOf(key);
@@ -399,7 +401,7 @@
     if (problems.length) return toast('กรุณา' + problems.join(', '));
 
     const pkg = SLS.build.buildPackage([{
-      name: look.name.trim(), creator: look.creator.trim(), background: parseInt(look.bg.slice(1), 16), ages: look.ages, genders: look.genders, hair: look.hair,
+      name: look.name.trim(), creator: look.creator.trim(), background: parseInt(look.bg.slice(1), 16), ages: look.ages, genders: look.genders, hair: look.hair, makeup: look.makeup,
       outfitCategories: look.outfitCategories, occults: look.occults, pose: look.pose,
       swatches: look.swatches.map(s => ({ sim: s.sim, outfit: s.outfit, color: (0xff000000 | parseInt(s.color.slice(1), 16)) >>> 0 })),
     }]);
@@ -414,7 +416,7 @@
   // Static mockup of the editor for the tutorial's last step.
   function miniEditorHTML() {
     const look = {
-      name: 'ชุดสบายๆ ไปเที่ยว', creator: 'คุณ', bg: '#52C4D2', genders: ['female'], hair: false,
+      name: 'ชุดสบายๆ ไปเที่ยว', creator: 'คุณ', bg: '#52C4D2', genders: ['female'], hair: false, makeup: false,
       ages: ['teen', 'youngAdult', 'adult', 'elder'], outfitCategories: ['everyday'], occults: ['human', 'fairy', 'vampire', 'witch'],
       pose: 'FeaturedLook_F_CoverGirl', active: 0,
       swatches: DEFAULT_COLORS.slice(0, 3).map(color => ({ color, sim: { firstName: '', key: '' } })),

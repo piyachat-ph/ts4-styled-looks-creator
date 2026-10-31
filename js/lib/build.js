@@ -4,9 +4,14 @@
   const { T_CASP, T_SCULPT, T_SMOD } = SLS.siminfo;
   const SL = SLS.styledlook;
 
-  // Body-type bit 2 (hair) in the outfit transfer mask. EA looks ship without it.
-  const FLAGS_NO_HAIR = 0x433efffffe2n;
-  const FLAGS_WITH_HAIR = FLAGS_NO_HAIR | 0x4n;
+  // Outfit transfer mask: one bit per body type that "Try this Style" puts on the Sim.
+  // Clothes only = the Sims 4 Studio "no hair, nails or makeup" value (0x4100FFFFDE2).
+  const FLAGS_CLOTHES = 0x4100ffffde2n;
+  const FLAG_HAIR = 0x4n; // body type 2
+  // Nails (9), lipstick/eyeshadow/eyeliner/blush/face paint (29–33) and mascara (37);
+  // with these EA's default 0x433EFFFFFE2 is restored.
+  const FLAG_MAKEUP = 0x23e0000200n;
+  const transferFlags = (hair, makeup) => FLAGS_CLOTHES | (hair ? FLAG_HAIR : 0n) | (makeup ? FLAG_MAKEUP : 0n);
 
   // CAS thumbnail background: uncompressed 32-bit DDS, 315x596, one color whose
   // alpha fades in from left to right. The alpha row is copied from EA's own backgrounds.
@@ -39,7 +44,7 @@
   // a teen or elder model leaves the CAS thumbnail blank.
   const modelAge = age => (age >= SL.AGE.teen && age <= SL.AGE.elder ? SL.AGE.youngAdult : age);
 
-  function simInfoFor(sim, outfit, hair) {
+  function simInfoFor(sim, outfit, hair, makeup) {
     const g = sim.genetic;
     return {
       version: 0x26,
@@ -54,7 +59,7 @@
       outfits: [{
         category: 0, unknown: 0,
         outfits: [{
-          id: 0n, unknown: 3, flags: hair ? FLAGS_WITH_HAIR : FLAGS_NO_HAIR, flags2: 0n, created: 0n, matchHair: 1,
+          id: 0n, unknown: 3, flags: transferFlags(hair, makeup), flags2: 0n, created: 0n, matchHair: 1,
           parts: outfit.parts.map(p => ({ key: key(T_CASP, p.id), bodyType: p.bodyType, colorShift: p.colorShift })),
         }],
       }],
@@ -75,7 +80,7 @@
     return /[^\x00-\x7f]/.test(s || '') || !ascii ? (ascii || 'Look') + fnv32((s || '').trim()).toString(16).toUpperCase() : ascii;
   };
 
-  // look: { name, creator, background: 0xRRGGBB, ages: [..AGE keys], genders: ['male'|'female'], hair: bool,
+  // look: { name, creator, background: 0xRRGGBB, ages: [..AGE keys], genders: ['male'|'female'], hair: bool, makeup: bool,
   //         outfitCategories: [..TAGS.outfit keys], occults: [..TAGS.occult keys], pose,
   //         swatches: [{ sim, outfit, color: 0xAARRGGBB }] }
   function buildLook(look) {
@@ -94,7 +99,7 @@
     if (look.background != null) resources.push({ type: T_DDS, group: 0, instance: backgroundId, data: backgroundDds(look.background) });
     look.swatches.forEach((sw, i) => {
       const simInstance = fnv64(`${base}_SimInfo${i + 1}`);
-      resources.push({ type: SLS.siminfo.TYPE, group: 0, instance: simInstance, data: SLS.siminfo.write(simInfoFor(sw.sim, sw.outfit, look.hair)) });
+      resources.push({ type: SLS.siminfo.TYPE, group: 0, instance: simInstance, data: SLS.siminfo.write(simInfoFor(sw.sim, sw.outfit, look.hair, look.makeup)) });
       resources.push({
         type: SL.TYPE, group: 0, instance: fnv64(base + (i + 1)),
         data: SL.write({
