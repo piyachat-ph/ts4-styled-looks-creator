@@ -19,8 +19,8 @@
     ['human', 'มนุษย์'], ['alien', 'เอเลี่ยน'], ['vampire', 'แวมไพร์'], ['mermaid', 'เงือก'],
     ['witch', 'ผู้ใช้เวทมนตร์'], ['werewolf', 'มนุษย์หมาป่า'], ['fairy', 'นางฟ้า'],
   ];
-  // EA's own looks allow these; forms with special bodies (alien, mermaid, werewolf) start off.
-  const DEFAULT_OCCULTS = ['human', 'vampire', 'witch', 'fairy'];
+  // New looks allow every occult by default.
+  const DEFAULT_OCCULTS = OCCULT_OPTIONS.map(([k]) => k);
 
   const state = {
     screen: 'tray', sims: [], error: '', shown: PAGE, multi: false, ccOnly: false, selected: new Set(), query: '',
